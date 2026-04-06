@@ -70,7 +70,15 @@ def logout_view(request):
 
 
 def concerts(request):
-    concert_list = Concert.objects.all()
+    all_concerts = Concert.objects.all()
+    concert_list = []
+    for c in all_concerts:
+        if request.user.is_authenticated:
+            attendee = ConcertAttending.objects.filter(concert=c, user=request.user).first()
+            status = attendee.attending if attendee else "-"
+        else:
+            status = "-"
+        concert_list.append({"concert": c, "status": status, "id": c.id})
     return render(request, "concerts.html", {"concerts": concert_list})
 
 
